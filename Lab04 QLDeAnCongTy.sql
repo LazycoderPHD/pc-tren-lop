@@ -245,10 +245,10 @@ PRINT 'All sample data inserted successfully.';
 GO
 
 --A1. Find employees who work on Project 1 OR Project 2, but NOT on both.
-select * from phancong
-select * from nhanvien
 select * from dean
 select * from diadiem_phg
+select * from nhanvien
+select * from phancong
 select * from phongban
 select * from thannhan
 
@@ -274,3 +274,31 @@ join phongban as [PB] on NV.PHG = PB.MAPHG
     left join NHANVIEN as [NVQL] ON NV.MA_NQL = NVQL.MANV
     left join PHANCONG as [PC] on nv.manv = pc.ma_nvien
 group by NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV, TENPHG, NVQL.TENNV
+
+--A3. Create a report showing departments with their project count, including departments with zero projects.
+SELECT PB.TENPHG, COUNT(DA.MADA) AS [SoLuongDeAn]
+FROM PHONGBAN PB
+LEFT JOIN DEAN DA ON PB.MAPHG = DA.PHONG
+GROUP BY PB.TENPHG;
+
+--A4. Find employees whose salary is higher than the average salary of their department.
+SELECT HONV, TENNV, LUONG, PHG
+FROM NHANVIEN NV
+WHERE LUONG > (SELECT AVG(LUONG) FROM NHANVIEN WHERE PHG = NV.PHG)
+
+--Task B: Division Operation and "For All" Queries (30 minutes)
+--Exercise B1: Find employees who work on ALL projects managed by Department 5.
+SELECT * FROM NHANVIEN NV
+WHERE NOT EXISTS (
+    SELECT MADA FROM DEAN WHERE PHONG = 5
+    EXCEPT
+    SELECT SODA FROM PHANCONG WHERE MA_NVIEN = NV.MANV
+)
+
+--Exercise B2: List employees who have worked on ALL projects (regardless of department).
+SELECT * FROM NHANVIEN NV
+WHERE NOT EXISTS (
+    SELECT MADA FROM DEAN
+    EXCEPT
+    SELECT SODA FROM PHANCONG WHERE MA_NVIEN = NV.MANV
+)
