@@ -243,3 +243,34 @@ GO
 
 PRINT 'All sample data inserted successfully.';
 GO
+
+--A1. Find employees who work on Project 1 OR Project 2, but NOT on both.
+select * from phancong
+select * from nhanvien
+select * from dean
+select * from diadiem_phg
+select * from phongban
+select * from thannhan
+
+
+select * from nhanvien
+where manv IN (select ma_nvien from phancong
+                where soda = 1 
+                and ma_nvien not in(select ma_nvien from phancong
+                                    where soda = 2))
+
+UNION
+
+select * from nhanvien
+where manv IN (select ma_nvien from phancong
+                where soda = 2 
+                and ma_nvien not in(select ma_nvien from phancong
+                                    where soda = 1))
+
+--A2. List all employees along with their department name, supervisor name, and number of projects they work on.
+select NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV, TENPHG, NVQL.TENNV as [NHAN VIEN QUAN LY], count(*) as [SL SoDA]
+from NHANVIEN as [NV]
+join phongban as [PB] on NV.PHG = PB.MAPHG
+    left join NHANVIEN as [NVQL] ON NV.MA_NQL = NVQL.MANV
+    left join PHANCONG as [PC] on nv.manv = pc.ma_nvien
+group by NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV, TENPHG, NVQL.TENNV
