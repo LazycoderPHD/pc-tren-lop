@@ -153,14 +153,13 @@ VALUES
 	('011', 20, 5),
 	('011', 30, 5)
 
---A1. Find employees who work on Project 1 OR Project 2, but NOT on both.
 select * from dean
 select * from DIADIEMPHG
 select * from nhanvien
 select * from phancong
 select * from phongban
 select * from thannhan
-
+--A1. Find employees who work on Project 1 OR Project 2, but NOT on both.
 
 select * from nhanvien
 where manv IN (select MANV from phancong
@@ -447,11 +446,10 @@ AND NV.MANV IN (
 --Exercise F3: Generate a department comparison report showing: department name, number of employees, total projects, average employee salary, highest paid employee name, and budget utilization (total project hours * 500,000).
 
 SELECT 
-    PB.TENPHG,
+    TENPHG,
     COUNT(DISTINCT NV.MANV) AS SoNhanVien,
     COUNT(DISTINCT DA.MADA) AS SoDeAn,
-    AVG(NV.LUONG) AS LuongTrungBinh,
-    (SELECT SUM(THOIGIAN) * 500000 FROM PHANCONG PC JOIN DEAN D ON PC.SODA = D.MADA WHERE D.PHONG = PB.MAPHG) AS BudgetUtilization
+    AVG(NV.LUONG) AS LuongTrungBinh
 FROM PHONGBAN PB
 LEFT JOIN NHANVIEN NV ON PB.MAPHG = NV.PHG
 LEFT JOIN DEAN DA ON PB.MAPHG = DA.PHONG
