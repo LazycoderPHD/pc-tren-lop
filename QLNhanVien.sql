@@ -225,3 +225,244 @@ WHERE NOT EXISTS (
     EXCEPT
     SELECT QUANHE FROM THANNHAN WHERE MANVIEN = NV.MANV
 )
+
+--Exercise B5: Find projects that have team members from ALL departments.
+SELECT * FROM DEAN DA
+WHERE NOT EXISTS (
+    SELECT MAPHG FROM PHONGBAN
+    EXCEPT
+    SELECT NV.PHG 
+    FROM PHANCONG PC 
+    JOIN NHANVIEN NV ON PC.MANV = NV.MANV 
+    WHERE PC.SODA = DA.MADA
+);
+
+--Task C: Nested Queries and Subqueries (35 minutes)
+--Exercise C1: Find employees whose salary is higher than the average salary of their own department.
+
+SELECT NV.HONV, NV.TENNV, NV.LUONG
+FROM NHANVIEN NV
+WHERE NV.LUONG > (SELECT AVG(LUONG) FROM NHANVIEN WHERE PHG = NV.PHG);
+
+--Exercise C2: List projects that have more assigned employees than the average number of employees per project.
+
+SELECT SODA, COUNT(MANV) AS SoNV
+FROM PHANCONG
+GROUP BY SODA
+HAVING COUNT(MANV) > (
+    SELECT AVG(CAST(CountNV AS FLOAT))
+    FROM (SELECT COUNT(MANV) AS CountNV FROM PHANCONG GROUP BY SODA) AS Temp
+);
+
+--Exercise C3: Find employees who work on at least one project in a different city than their department location.
+
+SELECT DISTINCT NV.*
+FROM NHANVIEN NV
+JOIN PHANCONG PC ON NV.MANV = PC.MANV
+JOIN DEAN DA ON PC.SODA = DA.MADA
+WHERE DA.DIADIEMDA NOT IN (SELECT DIADIEM FROM DIADIEMPHG WHERE MAPHG = NV.PHG);
+
+--Exercise C4: Identify departments where the manager's salary is lower than at least one employee in that department.
+
+SELECT PB.MAPHG, PB.TENPHG
+FROM PHONGBAN PB
+JOIN NHANVIEN MGR ON PB.TRUONGPHG = MGR.MANV
+WHERE MGR.LUONG < ANY (SELECT LUONG FROM NHANVIEN WHERE PHG = PB.MAPHG);
+
+--Exercise C5: Find the employee(s) with the second-highest salary in the company.
+
+SELECT * FROM NHANVIEN
+WHERE LUONG = (SELECT MAX(LUONG) FROM NHANVIEN 
+               WHERE LUONG < (SELECT MAX(LUONG) FROM NHANVIEN));
+
+--Exercise C6: List employees who have more dependents than their direct supervisor.
+
+SELECT NV.MANV, NV.TENNV
+FROM NHANVIEN NV
+WHERE (SELECT COUNT(*) FROM THANNHAN WHERE MANVIEN = NV.MANV) >
+      (SELECT COUNT(*) FROM THANNHAN WHERE MANVIEN = NV.MANQL);
+
+--Exercise C7: Find projects that have NO employees from Department 1 working on them.
+
+SELECT * FROM DEAN
+WHERE MADA NOT IN (
+    SELECT DISTINCT SODA FROM PHANCONG PC 
+    JOIN NHANVIEN NV ON PC.MANV = NV.MANV 
+    WHERE NV.PHG = 1
+);
+
+--Task D: Advanced SQL Functions (35 minutes)
+--Exercise D1: Display employee full names in uppercase format: "LAST, FIRST MIDDLE".
+
+SELECT UPPER(HONV + ', ' + TENLOT + ' ' + TENNV) AS FullName FROM NHANVIEN;
+
+--Exercise D2: Calculate each employee's age and years of service (from NG_NHANCHUC for managers).
+
+SELECT NV.TENNV, 
+       DATEDIFF(YEAR, NV.NGAYSINH, GETDATE()) AS Tuoi,
+       DATEDIFF(YEAR, PB.NGAYNHAMCHUC, GETDATE()) AS NamCongTac
+FROM NHANVIEN NV
+JOIN PHONGBAN PB ON NV.MANV = PB.TRUONGPHG;
+
+--Exercise D3: Extract the domain name from employee addresses (e.g., "TP.HCM" from full address).
+
+SELECT DIACHI, 
+       LTRIM(SUBSTRING(DIACHI, LEN(DIACHI) - CHARINDEX(',', REVERSE(DIACHI)) + 2, LEN(DIACHI))) AS TinhThanh
+FROM NHANVIEN;
+
+--Exercise D4: Calculate each project's total cost assuming each hour costs 500,000 VND.
+
+SELECT SODA, SUM(THOIGIAN) * 500000 AS TongChiPhi
+FROM PHANCONG
+GROUP BY SODA;
+
+--Exercise D5: Find employees whose birthday month is the current month.
+
+SELECT * FROM NHANVIEN WHERE MONTH(NGAYSINH) = MONTH(GETDATE());
+
+--Exercise D6: Round all employee salaries to the nearest thousand and display percentage above minimum wage (25,000).
+
+SELECT 
+    TENNV, 
+    LUONG AS LuongGoc,
+    ROUND(LUONG, -3) AS LuongLamTron,
+    CAST(((LUONG - 25000) / 25000.0) * 100 AS DECIMAL(10,2)) AS PhanTramTrenMucToiThieu
+FROM NHANVIEN;
+
+--Exercise D7: Generate email addresses for all employees using format: firstname.lastname@company.vn (lowercase, no Vietnamese characters).
+
+SELECT 
+    TENNV, 
+    HONV,
+    LOWER(CONCAT(TENNV, '.', HONV, '@company.vn')) AS EmailGoiY
+FROM NHANVIEN;
+
+--Task E: Conditional Logic with CASE Expressions (25 minutes)
+--Exercise E1: Categorize employees into salary grades: "Entry" (<30K), "Mid" (30-40K), "Senior" (40-50K), "Executive" (>50K).
+
+SELECT TENNV, LUONG,
+CASE 
+    WHEN LUONG < 30000 THEN 'Entry'
+    WHEN LUONG BETWEEN 30000 AND 40000 THEN 'Mid'
+    WHEN LUONG BETWEEN 40001 AND 50000 THEN 'Senior'
+    ELSE 'Executive'
+END AS SalaryGrade
+FROM NHANVIEN;
+
+--Exercise E2: Display project workload status: "Underutilized" (<20 total hours), "Normal" (20-50), "Heavy" (>50).
+
+SELECT SODA, SUM(THOIGIAN) AS TongGio,
+CASE 
+    WHEN SUM(THOIGIAN) < 20 THEN 'Underutilized'
+    WHEN SUM(THOIGIAN) BETWEEN 20 AND 50 THEN 'Normal'
+    ELSE 'Heavy'
+END AS WorkloadStatus
+FROM PHANCONG
+GROUP BY SODA;
+
+--Exercise E3: Create a seniority report showing retirement eligibility: "Eligible" (age ≥60 for men, ≥55 for women) or "Not Eligible".
+
+SELECT TENNV, PHAI, DATEDIFF(YEAR, NGAYSINH, GETDATE()) AS Tuoi,
+CASE 
+    WHEN PHAI = N'NAM' AND DATEDIFF(YEAR, NGAYSINH, GETDATE()) >= 60 THEN 'Eligible'
+    WHEN PHAI = N'NỮ' AND DATEDIFF(YEAR, NGAYSINH, GETDATE()) >= 55 THEN 'Eligible'
+    ELSE 'Not Eligible'
+END AS RetirementStatus
+FROM NHANVIEN;
+
+--Exercise E4: Calculate employee bonuses: 15% for those with >3 dependents, 10% for 1-3 dependents, 5% for no dependents.
+
+SELECT NV.TENNV, 
+CASE 
+    WHEN COUNT(TN.TENTN) > 3 THEN NV.LUONG * 0.15
+    WHEN COUNT(TN.TENTN) BETWEEN 1 AND 3 THEN NV.LUONG * 0.10
+    ELSE NV.LUONG * 0.05
+END AS BonusAmount
+FROM NHANVIEN NV
+LEFT JOIN THANNHAN TN ON NV.MANV = TN.MANVIEN
+GROUP BY NV.MANV, NV.TENNV, NV.LUONG;
+
+--Exercise E5: Classify projects by location: "Metropolitan" (TP.HCM, Hà Nội), "Coastal" (Nha Trang, Vũng Tàu), "Other".
+
+SELECT TENDA, DIADIEMDA,
+CASE 
+    WHEN DIADIEMDA IN (N'TP HCM', N'Hà Nội') THEN 'Metropolitan'
+    WHEN DIADIEMDA IN (N'Nha Trang', N'Vũng Tàu') THEN 'Coastal'
+    ELSE 'Other'
+END AS LocationClass
+FROM DEAN;
+
+--Exercise E6: Generate a performance summary: Show if employee hours exceed department average ("Above Average") or not.
+
+SELECT NV.TENNV, SUM(PC.THOIGIAN) AS TongGio,
+CASE 
+    WHEN SUM(PC.THOIGIAN) > (
+        SELECT AVG(TongGioPhong) 
+        FROM (SELECT SUM(THOIGIAN) AS TongGioPhong FROM PHANCONG GROUP BY MANV) AS Temp
+    ) THEN 'Above Average'
+    ELSE 'Below/At Average'
+END AS PerformanceRating
+FROM NHANVIEN NV
+LEFT JOIN PHANCONG PC ON NV.MANV = PC.MANV
+GROUP BY NV.MANV, NV.TENNV;
+
+--Task F: Comprehensive Challenge Problems (20 minutes)
+--Exercise F1: Create a comprehensive employee performance report including: full name, department, age, years of service, number of projects, total hours worked, average hours per project, salary grade, and performance rating (based on hours vs department average).
+
+SELECT 
+    NV.HONV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS HoTen,
+    PB.TENPHG,
+    DATEDIFF(YEAR, NV.NGAYSINH, GETDATE()) AS Tuoi,
+    DATEDIFF(YEAR, NV.NGAYSINH, GETDATE()) - 20 AS NamCongTac, -- Giả định bắt đầu làm từ 20 tuổi
+    COUNT(DISTINCT PC.SODA) AS SoDuAn,
+    SUM(PC.THOIGIAN) AS TongGio,
+    CASE 
+        WHEN NV.LUONG < 30000 THEN 'Entry'
+        WHEN NV.LUONG <= 50000 THEN 'Mid/Senior'
+        ELSE 'Executive'
+    END AS SalaryGrade,
+    CASE 
+        WHEN SUM(PC.THOIGIAN) > 30 THEN 'High Performer'
+        ELSE 'Standard'
+    END AS Performance
+FROM NHANVIEN NV
+JOIN PHONGBAN PB ON NV.PHG = PB.MAPHG
+LEFT JOIN PHANCONG PC ON NV.MANV = PC.MANV
+GROUP BY NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV, PB.TENPHG, NV.NGAYSINH, NV.LUONG;
+
+--Exercise F2: Find "universal employees" who work on ALL projects in their department AND have dependents of at least 2 different relationship types.
+
+SELECT NV.MANV, NV.TENNV
+FROM NHANVIEN NV
+WHERE NOT EXISTS (
+    SELECT MADA FROM DEAN WHERE PHONG = NV.PHG
+    EXCEPT
+    SELECT SODA FROM PHANCONG WHERE MANV = NV.MANV
+)
+AND NV.MANV IN (
+    SELECT MANVIEN FROM THANNHAN 
+    GROUP BY MANVIEN HAVING COUNT(DISTINCT QUANHE) >= 2
+);
+
+--Exercise F3: Generate a department comparison report showing: department name, number of employees, total projects, average employee salary, highest paid employee name, and budget utilization (total project hours * 500,000).
+
+SELECT 
+    PB.TENPHG,
+    COUNT(DISTINCT NV.MANV) AS SoNhanVien,
+    COUNT(DISTINCT DA.MADA) AS SoDeAn,
+    AVG(NV.LUONG) AS LuongTrungBinh,
+    (SELECT SUM(THOIGIAN) * 500000 FROM PHANCONG PC JOIN DEAN D ON PC.SODA = D.MADA WHERE D.PHONG = PB.MAPHG) AS BudgetUtilization
+FROM PHONGBAN PB
+LEFT JOIN NHANVIEN NV ON PB.MAPHG = NV.PHG
+LEFT JOIN DEAN DA ON PB.MAPHG = DA.PHONG
+GROUP BY PB.MAPHG, PB.TENPHG;
+
+--Exercise F4: Identify potential project manager candidates: employees who (1) work on at least 3 projects, (2) have salary in top 25% of their department, (3) have at least 2 dependents (showing stability), and (4) are between 30-50 years old.
+
+SELECT NV.MANV, NV.TENNV, NV.LUONG
+FROM NHANVIEN NV
+WHERE 
+    (SELECT COUNT(*) FROM PHANCONG WHERE MANV = NV.MANV) >= 3
+    AND NV.LUONG >= (SELECT AVG(LUONG) FROM NHANVIEN WHERE PHG = NV.PHG)
+    AND (SELECT COUNT(*) FROM THANNHAN WHERE MANVIEN = NV.MANV) >= 2
+    AND DATEDIFF(YEAR, NV.NGAYSINH, GETDATE()) BETWEEN 30 AND 50;
