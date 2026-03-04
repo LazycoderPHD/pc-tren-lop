@@ -302,3 +302,12 @@ WHERE NOT EXISTS (
     EXCEPT
     SELECT SODA FROM PHANCONG WHERE MA_NVIEN = NV.MANV
 )
+
+--Exercise B3: Find departments where ALL employees earn more than 30,000.
+select HONV, TENLOT, TENNV, NV.LUONG, NV.PHG from phongban as [pb]
+join nhanvien as [nv]
+on pb.MAPHG = nv.phg
+where luong > 30000
+
+--Exercise B4: Identify employees who have dependents of ALL relationship types present in the database.
+select * from nhanvien
