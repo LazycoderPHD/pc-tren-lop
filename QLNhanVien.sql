@@ -219,4 +219,9 @@ on pb.MAPHG = nv.phg
 where luong > 30000
 
 --Exercise B4: Identify employees who have dependents of ALL relationship types present in the database.
-select * from nhanvien
+SELECT * FROM NHANVIEN NV
+WHERE NOT EXISTS (
+    SELECT DISTINCT QUANHE FROM THANNHAN
+    EXCEPT
+    SELECT QUANHE FROM THANNHAN WHERE MANVIEN = NV.MANV
+)
