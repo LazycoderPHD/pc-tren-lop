@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OOP_buoi1
 {
-    internal class SinhVien
+    public class SinhVien
     {
         public string MaSo { get; set; }
         public string HoTen { get; set; }
@@ -14,11 +14,12 @@ namespace OOP_buoi1
         public int NamSinh { get; set; }
         public float DiemTB { get; set; }
 
-        // Thuộc tính tính toán xếp loại dựa trên điểm trung bình
         public string Loai => XepLoai();
 
+        // 1. Constructor mặc định (dùng cho svA)
         public SinhVien() { }
 
+        // 2. Constructor có tham số (dùng cho svB)
         public SinhVien(string maSo, string hoTen, string chuyenNganh, int namSinh, float diemTB)
         {
             MaSo = maSo;
@@ -28,7 +29,19 @@ namespace OOP_buoi1
             DiemTB = diemTB;
         }
 
-        // Phương thức xếp loại học lực
+        // 3. Copy Constructor (dùng cho svC sao chép từ svB)
+        public SinhVien(SinhVien other)
+        {
+            if (other != null)
+            {
+                MaSo = other.MaSo;
+                HoTen = other.HoTen;
+                ChuyenNganh = other.ChuyenNganh;
+                NamSinh = other.NamSinh;
+                DiemTB = other.DiemTB;
+            }
+        }
+
         public string XepLoai()
         {
             if (DiemTB < 5) return "Weak";
@@ -37,7 +50,6 @@ namespace OOP_buoi1
             return "Excellent";
         }
 
-        // Phương thức nhập thông tin kèm theo kiểm tra ràng buộc (Validation)
         public void NhapThongTin()
         {
             Console.Write("Enter Student ID (maSo): ");
@@ -49,7 +61,6 @@ namespace OOP_buoi1
             Console.Write("Enter Major (chuyenNganh): ");
             ChuyenNganh = Console.ReadLine()!;
 
-            // Ràng buộc tuổi từ 17 đến 70 (dựa trên năm hiện tại 2026)
             int currentYear = DateTime.Now.Year;
             while (true)
             {
@@ -66,7 +77,6 @@ namespace OOP_buoi1
                 Console.WriteLine("-> Invalid age! Age must be between 17 and 70. Please try again.");
             }
 
-            // Ràng buộc điểm trung bình từ 0 đến 10
             while (true)
             {
                 Console.Write("Enter Cumulative GPA (diemTB) [0 - 10]: ");
@@ -79,7 +89,6 @@ namespace OOP_buoi1
             }
         }
 
-        // Phương thức hiển thị thông tin
         public void HienThiThongTin()
         {
             Console.WriteLine("----------------------------------------");
