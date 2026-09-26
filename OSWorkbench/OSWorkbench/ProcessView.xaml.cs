@@ -32,7 +32,6 @@ namespace OSWorkbench
         private void LoadProcesses()
         {
             int? selectedPid = (GridProcesses.SelectedItem as ProcessInfo)?.Id;
-
             var list = new List<ProcessInfo>();
 
             foreach (var p in Process.GetProcesses())
@@ -48,13 +47,8 @@ namespace OSWorkbench
                         PriorityClassText = SafeRead(() => p.PriorityClass.ToString())
                     });
                 }
-                catch
-                {
-                }
-                finally
-                {
-                    p.Dispose();
-                }
+                catch { }
+                finally { p.Dispose(); }
             }
 
             var sorted = list.OrderBy(x => x.ProcessName).ToList();
@@ -75,7 +69,6 @@ namespace OSWorkbench
             try
             {
                 using var process = Process.GetProcessById(pid);
-
                 foreach (ProcessThread t in process.Threads)
                 {
                     list.Add(new ThreadInfo
@@ -87,19 +80,16 @@ namespace OSWorkbench
                     });
                 }
             }
-            catch
-            {
-            }
+            catch { }
 
             GridThreads.ItemsSource = list;
-            TxtThreadInfo.Text = $"Tiến trình PID {pid} có {list.Count} thread.";
+            TxtThreadInfo.Text = $"Tiến trình PID {pid} có {list.Count} thread (Phần C: Khảo sát Priority).";
 
-            // Mô phỏng cảnh báo EDR khi số lượng thread vượt mức 50
             if (list.Count > 50)
             {
                 TxtSecurityWarning.Text =
                     "⚠ Số thread bất thường (> 50). Công cụ giám sát bảo mật (EDR) dùng kiểu tín hiệu này " +
-                    "để đánh dấu tiến trình CẦN XEM XÉT KỸ HƠN — không có nghĩa tiến trình này chắc chắn độc hại.";
+                    "để đánh dấu tiến trình CẦN XEM XÉT KỸ HƠN.";
                 TxtSecurityWarning.Visibility = Visibility.Visible;
             }
             else
@@ -124,7 +114,7 @@ namespace OSWorkbench
         private void BtnStartChild_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("notepad.exe");
-            TxtStatus.Text = "Đã tạo tiến trình con notepad.exe — chờ tối đa 2 giây để thấy nó trong bảng.";
+            TxtStatus.Text = "Đã tạo tiến trình con notepad.exe.";
         }
 
         private void BtnMakeThreads_Click(object sender, RoutedEventArgs e)
@@ -138,9 +128,34 @@ namespace OSWorkbench
                 worker.IsBackground = true;
                 worker.Start();
             }
+            TxtStatus.Text = "Đã tạo 10 thread nền để kiểm tra EDR.";
+        }
 
-            TxtStatus.Text = "Đã tạo 10 thread nền (tự kết thúc sau 30 giây). " +
-                             "Chọn dòng OSWorkbench trong bảng để quan sát.";
+        // Xử lý nút bấm Phần C: Thay đổi độ ưu tiên Thread
+        private void BtnBoostPriority_Click(object sender, RoutedEventArgs e)
+        {
+            if (GridProcesses.SelectedItem is ProcessInfo selected)
+            {
+                try
+                {
+                    using var process = Process.GetProcessById(selected.Id);
+                    foreach (ProcessThread t in process.Threads)
+                    {
+                        // Thử nâng mức độ ưu tiên của thread lên mức cao nhất có thể
+                        t.PriorityLevel = ThreadPriorityLevel.Highest;
+                    }
+                    MessageBox.Show($"Đã nâng độ ưu tiên tất cả thread của PID {selected.Id} lên Highest thành công!", "Phần C - Khảo sát Priority");
+                    LoadThreads(selected.Id);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Không đủ quyền để thay đổi độ ưu tiên thread hệ thống: {ex.Message}", "Thông báo");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn một tiến trình ở bảng trên trước khi thao tác!", "Nhắc nhở");
+            }
         }
     }
 }
