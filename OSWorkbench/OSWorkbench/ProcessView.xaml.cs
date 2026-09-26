@@ -14,18 +14,15 @@ namespace OSWorkbench
 
         public ProcessView()
         {
-            InitializeComponent();   // dựng giao diện từ file .xaml
-            LoadProcesses();         // nạp dữ liệu lần đầu
+            InitializeComponent();
+            LoadProcesses();
 
-            // Tự làm mới mỗi 2 giây
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(2);
             _timer.Tick += (s, e) => LoadProcesses();
             _timer.Start();
         }
 
-        // Đọc một thông tin "an toàn": nếu Windows từ chối quyền đọc
-        // thì trả về một dòng chữ thay vì làm chương trình crash
         private static string SafeRead(Func<string> read)
         {
             try { return read(); }
@@ -34,7 +31,6 @@ namespace OSWorkbench
 
         private void LoadProcesses()
         {
-            // Nhớ PID của dòng đang chọn để chọn lại sau khi làm mới
             int? selectedPid = (GridProcesses.SelectedItem as ProcessInfo)?.Id;
 
             var list = new List<ProcessInfo>();
@@ -54,11 +50,10 @@ namespace OSWorkbench
                 }
                 catch
                 {
-                    // Tiến trình vừa thoát đúng lúc đang đọc — bỏ qua
                 }
                 finally
                 {
-                    p.Dispose();   // trả lại tài nguyên (handle) cho Windows
+                    p.Dispose();
                 }
             }
 
@@ -73,7 +68,52 @@ namespace OSWorkbench
             TxtStatus.Text = $"Cập nhật lúc {DateTime.Now:HH:mm:ss} — {list.Count} tiến trình";
         }
 
-        // Bước 6 sẽ thêm các hàm xử lý nút bấm vào ngay dưới dòng này
+        private void LoadThreads(int pid)
+        {
+            var list = new List<ThreadInfo>();
+
+            try
+            {
+                using var process = Process.GetProcessById(pid);
+
+                foreach (ProcessThread t in process.Threads)
+                {
+                    list.Add(new ThreadInfo
+                    {
+                        ThreadId = t.Id,
+                        StateText = SafeRead(() => t.ThreadState.ToString()),
+                        PriorityText = SafeRead(() => t.PriorityLevel.ToString()),
+                        StartTimeText = SafeRead(() => t.StartTime.ToString("HH:mm:ss"))
+                    });
+                }
+            }
+            catch
+            {
+            }
+
+            GridThreads.ItemsSource = list;
+            TxtThreadInfo.Text = $"Tiến trình PID {pid} có {list.Count} thread.";
+
+            if (list.Count > 50)
+            {
+                TxtSecurityWarning.Text =
+                    "⚠ Số thread bất thường (> 50). Công cụ giám sát bảo mật (EDR) dùng kiểu tín hiệu này " +
+                    "để đánh dấu tiến trình CẦN XEM XÉT KỸ HƠN — không có nghĩa tiến trình này chắc chắn độc hại.";
+                TxtSecurityWarning.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TxtSecurityWarning.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void GridProcesses_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (GridProcesses.SelectedItem is ProcessInfo selected)
+            {
+                LoadThreads(selected.Id);
+            }
+        }
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
@@ -82,10 +122,24 @@ namespace OSWorkbench
 
         private void BtnStartChild_Click(object sender, RoutedEventArgs e)
         {
-            // Yêu cầu Windows tạo một tiến trình mới chạy notepad.exe
             Process.Start("notepad.exe");
             TxtStatus.Text = "Đã tạo tiến trình con notepad.exe — chờ tối đa 2 giây để thấy nó trong bảng.";
         }
-       
+
+        private void BtnMakeThreads_Click(object sender, RoutedEventArgs e)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var worker = new System.Threading.Thread(() =>
+                {
+                    System.Threading.Thread.Sleep(30000);
+                });
+                worker.IsBackground = true;
+                worker.Start();
+            }
+
+            TxtStatus.Text = "Đã tạo 10 thread nền (tự kết thúc sau 30 giây). " +
+                             "Chọn dòng OSWorkbench trong bảng để quan sát.";
+        }
     }
 }
