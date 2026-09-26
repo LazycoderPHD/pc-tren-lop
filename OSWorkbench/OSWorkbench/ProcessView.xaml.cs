@@ -74,5 +74,17 @@ namespace OSWorkbench
         }
 
         // Bước 6 sẽ thêm các hàm xử lý nút bấm vào ngay dưới dòng này
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadProcesses();
+        }
+
+        private void BtnStartChild_Click(object sender, RoutedEventArgs e)
+        {
+            // Yêu cầu Windows tạo một tiến trình mới chạy notepad.exe
+            Process.Start("notepad.exe");
+            TxtStatus.Text = "Đã tạo tiến trình con notepad.exe — chờ tối đa 2 giây để thấy nó trong bảng.";
+        }
     }
 }
