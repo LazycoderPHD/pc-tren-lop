@@ -94,6 +94,7 @@ namespace OSWorkbench
             GridThreads.ItemsSource = list;
             TxtThreadInfo.Text = $"Tiến trình PID {pid} có {list.Count} thread.";
 
+            // Mô phỏng cảnh báo EDR khi số lượng thread vượt mức 50
             if (list.Count > 50)
             {
                 TxtSecurityWarning.Text =

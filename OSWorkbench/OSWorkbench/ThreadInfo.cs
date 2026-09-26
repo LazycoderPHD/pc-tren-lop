@@ -1,6 +1,5 @@
 ﻿namespace OSWorkbench
 {
-    // Lớp trung gian: mỗi đối tượng = 1 dòng trên bảng Thread
     public class ThreadInfo
     {
         public int ThreadId { get; set; }
