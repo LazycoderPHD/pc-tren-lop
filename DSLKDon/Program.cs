@@ -4,45 +4,53 @@ namespace DSLKDon
 {
     class Program
     {
-        static void TestInput()
-        {
-            MyList list = new MyList();
-            Console.WriteLine("=== NHAP DANH SACH ===");
-            list.Input();
-
-            Console.WriteLine("\nInteger linked list:");
-            list.ShowList();
-            Console.WriteLine($"Total elements (Count): {list.Count}");
-
-            // Test SearchX
-            Console.Write("\nEnter value to search (x): ");
-            if (int.TryParse(Console.ReadLine(), out int x))
-            {
-                IntNode found = list.SearchX(x);
-                if (found != null)
-                    Console.WriteLine($"-> Found {x} in the list!");
-                else
-                    Console.WriteLine($"-> {x} not found in the list.");
-            }
-
-            // Test GetMax & GetMin
-            IntNode maxNode = list.GetMax();
-            IntNode minNode = list.GetMin();
-
-            if (maxNode != null && minNode != null)
-            {
-                Console.WriteLine($"-> Max value: {maxNode.Data}");
-                Console.WriteLine($"-> Min value: {minNode.Data}");
-            }
-            else
-            {
-                Console.WriteLine("-> The list is empty.");
-            }
-        }
-
         static void Main(string[] args)
         {
-            TestInput();
+            Console.WriteLine("=== PHAN A & B: NHAP DANH SACH VA TACH CHAN/LE ===");
+            MyList list1 = new MyList();
+            list1.Input();
+
+            Console.WriteLine("\nDanh sach goc (Original list):");
+            list1.ShowList();
+
+            // Test Câu 2: Tìm kiếm, Max, Min
+            Console.WriteLine($"\n--- Thong tin co bản ---");
+            Console.WriteLine($"Tong so phan tury (Count): {list1.Count}");
+
+            if (!list1.IsEmpty())
+            {
+                Console.WriteLine($"Max value: {list1.GetMax()?.Data}");
+                Console.WriteLine($"Min value: {list1.GetMin()?.Data}");
+            }
+
+            // Test Phần B - Câu 4: Tách chẵn / lẻ[cite: 10, 11]
+            Console.WriteLine("\n--- Test Tach Chan / Le (Question 4) ---");
+            MyList evenList = list1.GetEvenList();
+            MyList oddList = list1.GetOddList();
+
+            Console.Write("Even numbers list: ");
+            evenList.ShowList();
+
+            Console.Write("Odd numbers list: ");
+            oddList.ShowList();
+
+            // Test Phần C - Câu 5: Nối hai danh sách[cite: 11]
+            Console.WriteLine("\n=== PHAN C: NOI HAI DANH SACH (Question 5) ===");
+            Console.WriteLine("Nhap danh sach thu hai (list2):");
+            MyList list2 = new MyList();
+            list2.Input();
+
+            Console.Write("Danh sach 1: ");
+            list1.ShowList();
+            Console.Write("Danh sach 2: ");
+            list2.ShowList();
+
+            // Thực hiện nối list1 và list2 thành list3[cite: 11]
+            MyList list3 = MyList.JoinList(list1, list2);
+            Console.Write("Danh sach sau khi noi (list3): ");
+            list3.ShowList();
+
+            Console.WriteLine("\nHoan tat kiem thu tat ca cac chuc nang!");
         }
     }
 }

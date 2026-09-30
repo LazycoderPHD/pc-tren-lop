@@ -149,5 +149,65 @@ namespace DSLKDon
             }
             return minNode;
         }
+
+        // ==================== PHẦN B: CÂU 4 (Tách danh sách chẵn/lẻ) ====================
+
+        // Trả về danh sách gồm các số chẵn
+        public MyList GetEvenList()
+        {
+            MyList evenList = new MyList();
+            IntNode p = first;
+            while (p != null)
+            {
+                if (p.Data % 2 == 0)
+                {
+                    evenList.AddLast(new IntNode(p.Data));
+                }
+                p = p.Next;
+            }
+            return evenList;
+        }
+
+        // Trả về danh sách gồm các số lẻ
+        public MyList GetOddList()
+        {
+            MyList oddList = new MyList();
+            IntNode p = first;
+            while (p != null)
+            {
+                if (p.Data % 2 != 0)
+                {
+                    oddList.AddLast(new IntNode(p.Data));
+                }
+                p = p.Next;
+            }
+            return oddList;
+        }
+
+        // ==================== PHẦN C: CÂU 5 (Nối hai danh sách) ====================
+
+        // Tạo list3 bằng cách nối list2 vào sau list1 (sử dụng node mới hoàn toàn)[cite: 11]
+        public static MyList JoinList(MyList list1, MyList list2)
+        {
+            MyList list3 = new MyList();
+
+            // Sao chép các phần tử của list1 sang list3
+            IntNode p = list1.First;
+            while (p != null)
+            {
+                list3.AddLast(new IntNode(p.Data));
+                p = p.Next;
+            }
+
+            // Sao chép các phần tử của list2 sang list3
+            p = list2.First;
+            while (p != null)
+            {
+                list3.AddLast(new IntNode(p.Data));
+                p = p.Next;
+            }
+
+            return list3;
+        }
     }
 }
