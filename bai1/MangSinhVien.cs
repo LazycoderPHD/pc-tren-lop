@@ -146,75 +146,48 @@ namespace OOP_buoi1
         {
             for (int i = 0; i < vt; i++)
             {
-                if (a[i].MaSo.CompareTo(msx) == 0)
+                if (danhSach[i].MaSo.CompareTo(msx) == 0)
                     return true;
             }
             return false;
         }
 
-        public void NhapDanhSach()
-        {
-            // ... các bước khởi tạo số lượng n ...
-            for (int i = 0; i < n; i++)
-            {
-                a[i] = new SinhVien();
-                string maSoMoi;
-                do
-                {
-                    Console.Write($"Nhập mã số cho sinh viên thứ {i + 1}: ");
-                    maSoMoi = Console.ReadLine();
-
-                    if (TonTai(maSoMoi, i))
-                    {
-                        Console.WriteLine("-> Lỗi: Mã số sinh viên đã tồn tại! Vui lòng nhập lại mã số khác.");
-                    }
-                } while (TonTai(maSoMoi, i));
-
-                a[i].MaSo = maSoMoi;
-                // Nhập các thông tin khác của sinh viên (Họ tên, điểm,...)
-                // a[i].NhapThongTinKhac();
-            }
-        }
-
         // 1. Sắp xếp danh sách sinh viên tăng dần theo Mã số sinh viên dùng Selection Sort
         public void SapXepTheoMaSo()
         {
-            int n = a.Length; // hoặc số lượng phần tử thực tế của mảng
             for (int i = 0; i < n - 1; i++)
             {
                 int minIdx = i;
                 for (int j = i + 1; j < n; j++)
                 {
-                    // So sánh chuỗi Mã số (MaSo)
-                    if (a[j].MaSo.CompareTo(a[minIdx].MaSo) < 0)
+                    if (danhSach[j].MaSo.CompareTo(danhSach[minIdx].MaSo) < 0)
                     {
                         minIdx = j;
                     }
                 }
                 if (minIdx != i)
                 {
-                    SinhVien temp = a[i];
-                    a[i] = a[minIdx];
-                    a[minIdx] = temp;
+                    SinhVien temp = danhSach[i];
+                    danhSach[i] = danhSach[minIdx];
+                    danhSach[minIdx] = temp;
                 }
             }
         }
 
-        // 2. Sắp xếp danh sách sinh viên giảm dần theo Điểm tích lũy (GPA) dùng Insertion Sort
+        // 2. Sắp xếp danh sách sinh viên giảm dần theo Điểm tích lũy dùng Insertion Sort
         public void SapXepTheoGPA()
         {
-            int n = a.Length;
             for (int i = 1; i < n; i++)
             {
-                SinhVien key = a[i];
+                SinhVien key = danhSach[i];
                 int j = i - 1;
-                // Sắp xếp giảm dần nên đổi điều kiện a[j].GPA < key.GPA
-                while (j >= 0 && a[j].GPA < key.GPA)
+                // Đổi DiemTB cho khớp với thuộc tính trong class SinhVien của bạn
+                while (j >= 0 && danhSach[j].DiemTB < key.DiemTB)
                 {
-                    a[j + 1] = a[j];
+                    danhSach[j + 1] = danhSach[j];
                     j--;
                 }
-                a[j + 1] = key;
+                danhSach[j + 1] = key;
             }
         }
     }
