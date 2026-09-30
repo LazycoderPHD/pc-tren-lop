@@ -141,5 +141,39 @@ namespace OOP_buoi1
                 }
             }
         }
+
+        public bool TonTai(string msx, int vt)
+        {
+            for (int i = 0; i < vt; i++)
+            {
+                if (a[i].MaSo.CompareTo(msx) == 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void NhapDanhSach()
+        {
+            // ... các bước khởi tạo số lượng n ...
+            for (int i = 0; i < n; i++)
+            {
+                a[i] = new SinhVien();
+                string maSoMoi;
+                do
+                {
+                    Console.Write($"Nhập mã số cho sinh viên thứ {i + 1}: ");
+                    maSoMoi = Console.ReadLine();
+
+                    if (TonTai(maSoMoi, i))
+                    {
+                        Console.WriteLine("-> Lỗi: Mã số sinh viên đã tồn tại! Vui lòng nhập lại mã số khác.");
+                    }
+                } while (TonTai(maSoMoi, i));
+
+                a[i].MaSo = maSoMoi;
+                // Nhập các thông tin khác của sinh viên (Họ tên, điểm,...)
+                // a[i].NhapThongTinKhac();
+            }
+        }
     }
 }
