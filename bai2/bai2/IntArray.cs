@@ -258,6 +258,231 @@ namespace bai2
                 Console.WriteLine("Kết quả: Không tìm thấy!");
         }
 
+        // Phương thức đổi chỗ phụ trợ
+        public void HoanVi(ref int a, ref int b)
+        {
+            int tam = a;
+            a = b;
+            b = tam;
+        }
 
+        // --- PART A: Các thuật toán sắp xếp cơ bản ---
+
+        // 1. Interchange Sort
+        public void InterchangeSort()
+        {
+            int n = arr.Length;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    if (arr[i] > arr[j])
+                    {
+                        HoanVi(ref arr[i], ref arr[j]);
+                    }
+                }
+            }
+        }
+
+        // 2. Bubble Sort
+        public void BubbleSort()
+        {
+            int n = arr.Length;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = n - 1; j > i; j--)
+                {
+                    if (arr[j] < arr[j - 1])
+                    {
+                        HoanVi(ref arr[j], ref arr[j - 1]);
+                    }
+                }
+            }
+        }
+
+        // 3. Selection Sort
+        public void SelectionSort()
+        {
+            int n = arr.Length;
+            for (int i = 0; i < n - 1; i++)
+            {
+                int minIdx = i;
+                for (int j = i + 1; j < n; j++)
+                {
+                    if (arr[j] < arr[minIdx])
+                    {
+                        minIdx = j;
+                    }
+                }
+                if (minIdx != i)
+                {
+                    HoanVi(ref arr[i], ref arr[minIdx]);
+                }
+            }
+        }
+
+        // 4. Insertion Sort
+        public void InsertionSort()
+        {
+            int n = arr.Length;
+            for (int i = 1; i < n; i++)
+            {
+                int key = arr[i];
+                int j = i - 1;
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+
+        // 5. Quick Sort (Hàm gọi nhanh)
+        public void QuickSort()
+        {
+            QuickSortRecursive(0, arr.Length - 1);
+        }
+
+        private void QuickSortRecursive(int left, int right)
+        {
+            if (left >= right) return;
+            int pivot = arr[(left + right) / 2];
+            int i = left, j = right;
+            while (i <= j)
+            {
+                while (arr[i] < pivot) i++;
+                while (arr[j] > pivot) j--;
+                if (i <= j)
+                {
+                    HoanVi(ref arr[i], ref arr[j]);
+                    i++;
+                    j--;
+                }
+            }
+            if (left < j) QuickSortRecursive(left, j);
+            if (i < right) QuickSortRecursive(i, right);
+        }
+
+
+        // --- PART B: Các thuật toán sắp xếp nâng cao ---
+
+        // 1. Heap Sort
+        public void HeapSort()
+        {
+            int n = arr.Length;
+            for (int i = n / 2 - 1; i >= 0; i--)
+                Heapify(n, i);
+
+            for (int i = n - 1; i > 0; i--)
+            {
+                HoanVi(ref arr[0], ref arr[i]);
+                Heapify(i, 0);
+            }
+        }
+
+        private void Heapify(int n, int i)
+        {
+            int largest = i;
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && arr[left] > arr[largest]) largest = left;
+            if (right < n && arr[right] > arr[largest]) largest = right;
+
+            if (largest != i)
+            {
+                HoanVi(ref arr[i], ref arr[largest]);
+                Heapify(n, largest);
+            }
+        }
+
+        // 2. Shell Sort
+        public void ShellSort()
+        {
+            int n = arr.Length;
+            for (int gap = n / 2; gap > 0; gap /= 2)
+            {
+                for (int i = gap; i < n; i += 1)
+                {
+                    int temp = arr[i];
+                    int j;
+                    for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
+                    {
+                        arr[j] = arr[j - gap];
+                    }
+                    arr[j] = temp;
+                }
+            }
+        }
+
+        // 3. Shaker Sort (Cocktail Shaker Sort)
+        public void ShakerSort()
+        {
+            int left = 0, right = arr.Length - 1;
+            bool swapped = true;
+            while (swapped)
+            {
+                swapped = false;
+                for (int i = left; i < right; i++)
+                {
+                    if (arr[i] > arr[i + 1])
+                    {
+                        HoanVi(ref arr[i], ref arr[i + 1]);
+                        swapped = true;
+                    }
+                }
+                right--;
+                if (!swapped) break;
+
+                swapped = false;
+                for (int i = right; i > left; i--)
+                {
+                    if (arr[i] < arr[i - 1])
+                    {
+                        HoanVi(ref arr[i], ref arr[i - 1]);
+                        swapped = true;
+                    }
+                }
+                left++;
+            }
+        }
+
+        // 4. Merge Sort
+        public void MergeSort()
+        {
+            MergeSortRecursive(0, arr.Length - 1);
+        }
+
+        private void MergeSortRecursive(int left, int right)
+        {
+            if (left < right)
+            {
+                int mid = left + (right - left) / 2;
+                MergeSortRecursive(left, mid);
+                MergeSortRecursive(mid + 1, right);
+                Merge(left, mid, right);
+            }
+        }
+
+        private void Merge(int left, int mid, int right)
+        {
+            int n1 = mid - left + 1;
+            int n2 = right - mid;
+            int[] L = new int[n1];
+            int[] R = new int[n2];
+
+            Array.Copy(arr, left, L, 0, n1);
+            Array.Copy(arr, mid + 1, R, 0, n2);
+
+            int i = 0, j = 0, k = left;
+            while (i < n1 && j < n2)
+            {
+                if (L[i] <= R[j]) arr[k++] = L[i++];
+                else arr[k++] = R[j++];
+            }
+            while (i < n1) arr[k++] = L[i++];
+            while (j < n2) arr[k++] = R[j++];
+        }
     }
 }

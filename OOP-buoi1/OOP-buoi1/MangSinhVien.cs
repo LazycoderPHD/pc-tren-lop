@@ -175,5 +175,47 @@ namespace OOP_buoi1
                 // a[i].NhapThongTinKhac();
             }
         }
+
+        // 1. Sắp xếp danh sách sinh viên tăng dần theo Mã số sinh viên dùng Selection Sort
+        public void SapXepTheoMaSo()
+        {
+            int n = a.Length; // hoặc số lượng phần tử thực tế của mảng
+            for (int i = 0; i < n - 1; i++)
+            {
+                int minIdx = i;
+                for (int j = i + 1; j < n; j++)
+                {
+                    // So sánh chuỗi Mã số (MaSo)
+                    if (a[j].MaSo.CompareTo(a[minIdx].MaSo) < 0)
+                    {
+                        minIdx = j;
+                    }
+                }
+                if (minIdx != i)
+                {
+                    SinhVien temp = a[i];
+                    a[i] = a[minIdx];
+                    a[minIdx] = temp;
+                }
+            }
+        }
+
+        // 2. Sắp xếp danh sách sinh viên giảm dần theo Điểm tích lũy (GPA) dùng Insertion Sort
+        public void SapXepTheoGPA()
+        {
+            int n = a.Length;
+            for (int i = 1; i < n; i++)
+            {
+                SinhVien key = a[i];
+                int j = i - 1;
+                // Sắp xếp giảm dần nên đổi điều kiện a[j].GPA < key.GPA
+                while (j >= 0 && a[j].GPA < key.GPA)
+                {
+                    a[j + 1] = a[j];
+                    j--;
+                }
+                a[j + 1] = key;
+            }
+        }
     }
 }
