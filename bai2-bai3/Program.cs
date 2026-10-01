@@ -3,39 +3,40 @@
 class Program
 {
 
-    static void TestInterchangeSort(IntArray obj)
-    {
-        IntArray objTam = new IntArray(obj);
-        Console.WriteLine("\n>> Mảng gốc trước khi sắp xếp:");
-        objTam.Xuat();
-        objTam.InterchangeSort();
-        Console.WriteLine(">> Sau khi chạy Interchange Sort:");
-        objTam.Xuat();
-    }
-
-    static void TestInsertionSort(IntArray obj)
-    {
-        IntArray objTam = new IntArray(obj);
-        Console.WriteLine("\n>> Mảng gốc trước khi sắp xếp:");
-        objTam.Xuat();
-        objTam.InsertionSort();
-        Console.WriteLine(">> Sau khi chạy Insertion Sort:");
-        objTam.Xuat();
-    }
-
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        // Tạo mảng ngẫu nhiên gồm 10 phần tử để test
-        IntArray obj = new IntArray(10);
+        // Kiểm tra Câu 1 & 2 & 3 (Phần A)
+        Console.Write(">> Nhập kích thước mảng ngẫu nhiên k: ");
+        int.TryParse(Console.ReadLine(), out int k);
 
-        TestInterchangeSort(obj);
-        TestInsertionSort(obj);
+        IntArray objA = new IntArray(k);
+        Console.WriteLine(">> Giá trị mảng ngẫu nhiên objA:");
+        objA.Xuat();
 
-        // Tương tự bạn có thể gọi test cho các thuật toán khác: BubbleSort, SelectionSort, QuickSort, HeapSort, ShellSort, ShakerSort, MergeSort...
+        Console.Write("\n>> Nhập giá trị x cần tìm kiếm tuần tự: ");
+        int.TryParse(Console.ReadLine(), out int x);
+        int kqTT = objA.TimTuanTu(x);
+        if (kqTT == -1)
+            Console.WriteLine($"-> Không tìm thấy {x} trong mảng.");
+        else
+            Console.WriteLine($"-> Tìm thấy {x} tại vị trí {kqTT}");
 
-        Console.ReadKey();
+        // Kiểm tra phần minh họa (Phần C)
+        //objA.MinhHoaTimTuanTu(x);
+
+        // Kiểm tra tìm kiếm nhị phân (yêu cầu mảng đã sắp xếp)
+        // Bạn có thể tạo mảng thủ công đã sắp xếp hoặc dùng thuật toán sắp xếp
+        int[] sortedData = { 2, 5, 8, 12, 16, 23, 38, 56, 72, 91 };
+        IntArray objB = new IntArray(sortedData);
+        Console.WriteLine("\n>> Mảng đã sắp xếp (objB cho tìm kiếm nhị phân):");
+        objB.Xuat();
+
+        Console.Write(">> Nhập giá trị x cần tìm kiếm nhị phân trong objB: ");
+        int.TryParse(Console.ReadLine(), out int xBinary);
+        objB.MinhHoaTimNhiPhan(xBinary);
+
     }
 
 }
