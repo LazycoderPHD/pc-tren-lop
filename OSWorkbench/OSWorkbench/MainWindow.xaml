@@ -9,5 +9,8 @@
         </TabItem>
 
         <!-- Các module của buổi sau sẽ thêm TabItem mới ngay dưới dòng này -->
+        <TabItem Header="Giám sát">
+            <local:MonitorView/>
+        </TabItem>
     </TabControl>
 </Window>
