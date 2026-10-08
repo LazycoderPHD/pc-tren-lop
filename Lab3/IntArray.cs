@@ -47,7 +47,19 @@ namespace Lab3
             {
                 arr = new int[0];
             }
+
+            // arr = new int[k] nếu như muốn người dùng tự nhập dữ liệu
         }
+
+        // public void Nhap()
+        // {
+        //     Console.WriteLine($"\nNhập các phần tử cho mảng ({arr.Length} phần tử):");
+        //     for (int i = 0; i < arr.Length; i++)
+        //     {
+        //         Console.Write($"  Phần tử thứ {i + 1}: ");
+        //         arr[i] = int.Parse(Console.ReadLine());
+        //     }
+        // } nếu như muốn tự người dùng nhập dữ liệu
 
         public IntArray(int[] a)
         {
