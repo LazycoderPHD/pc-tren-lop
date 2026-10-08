@@ -54,8 +54,9 @@ class Program
 
     static void Main(string[] args)
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.Write("Nhập số lượng phần tử k: ");
-        int k = int.Parse(Console.ReadLine());
+        int k = int.Parse(Console.ReadLine()!);
 
         IntArray objA = new IntArray(k); // Tạo mảng với k phần tử ngẫu nhiên
 
