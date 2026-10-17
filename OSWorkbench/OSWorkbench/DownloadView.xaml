@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="OSWorkbench.DownloadView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Hàng 0: thêm file -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnSamples" Content="Thêm 6 file mẫu" Width="130" Height="30" Click="BtnSamples_Click"/>
+            <TextBlock Text="URL:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBox x:Name="TxtUrl" Width="230" Margin="6,0,0,0" VerticalContentAlignment="Center"
+                     Text="https://example.com/file.zip"/>
+            <TextBlock Text="Dung lượng (MB):" VerticalAlignment="Center" Margin="12,0,0,0"/>
+            <TextBox x:Name="TxtSizeMb" Text="2" Width="45" Margin="6,0,0,0" VerticalContentAlignment="Center"/>
+            <Button x:Name="BtnAdd" Content="Thêm file" Width="90" Height="30" Margin="12,0,0,0" Click="BtnAdd_Click"/>
+            <Button x:Name="BtnClear" Content="Xoá danh sách" Width="110" Height="30" Margin="12,0,0,0" Click="BtnClear_Click"/>
+        </StackPanel>
+
+        <!-- Hàng 1: điều khiển -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Số worker:" VerticalAlignment="Center"/>
+            <Slider x:Name="SldWorkers" Width="140" Minimum="1" Maximum="16" TickFrequency="1"
+                    IsSnapToTickEnabled="True" Value="4" VerticalAlignment="Center" Margin="6,0,0,0"
+                    ValueChanged="SldWorkers_ValueChanged"/>
+            <TextBlock x:Name="TxtWorkers" Text="4" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Text="Nguồn:" VerticalAlignment="Center" Margin="16,0,0,0"/>
+            <ComboBox x:Name="CmbSource" Width="150" Margin="6,0,0,0" SelectedIndex="0"
+                      SelectionChanged="CmbSource_SelectionChanged">
+                <ComboBoxItem Content="Giả lập (offline)"/>
+                <ComboBoxItem Content="HTTP thật"/>
+            </ComboBox>
+            <Button x:Name="BtnStart" Content="Bắt đầu tải" Width="110" Height="30" Margin="16,0,0,0" Click="BtnStart_Click"/>
+            <Button x:Name="BtnPause" Content="Tạm dừng" Width="90" Height="30" Margin="10,0,0,0" IsEnabled="False"
+                    Click="BtnPause_Click"/>
+            <Button x:Name="BtnCancel" Content="Huỷ" Width="70" Height="30" Margin="10,0,0,0" IsEnabled="False"
+                    Click="BtnCancel_Click"/>
+            <CheckBox x:Name="ChkLock" Content="Có dùng lock" IsChecked="True" VerticalAlignment="Center"
+                      Margin="20,0,0,0" Click="ChkLock_Click"/>
+            <CheckBox x:Name="ChkWiden" Content="Phóng đại khe hở" VerticalAlignment="Center" Margin="12,0,0,0"
+                      Click="ChkWiden_Click"/>
+        </StackPanel>
+
+        <!-- Hàng 2: bảng các file -->
+        <GroupBox Grid.Row="2" Header="Danh sách file (mỗi dòng là một file; nhiều worker cùng lấy việc từ hàng đợi)">
+            <DataGrid x:Name="GridJobs" AutoGenerateColumns="False" IsReadOnly="True" Margin="4">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="40"/>
+                    <DataGridTextColumn Header="Tên file" Binding="{Binding Name}" Width="2*"/>
+                    <DataGridTextColumn Header="Nguồn" Binding="{Binding Source}" Width="2*"/>
+                    <DataGridTextColumn Header="Đã tải / Tổng (MB)" Binding="{Binding TienDo}" Width="150"/>
+                    <DataGridTextColumn Header="%" Binding="{Binding PhanTram}" Width="60"/>
+                    <DataGridTextColumn Header="Tốc độ" Binding="{Binding TocDo}" Width="100"/>
+                    <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="90"/>
+                    <DataGridTextColumn Header="Ghi chú" Binding="{Binding GhiChu}" Width="2*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- Hàng 3: thống kê + bất biến -->
+        <StackPanel Grid.Row="3" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="TxtTime" FontFamily="Consolas" Width="110"/>
+                <TextBlock x:Name="TxtTotal" FontFamily="Consolas" Width="150"/>
+                <TextBlock x:Name="TxtRate" FontFamily="Consolas" Width="180"/>
+                <TextBlock x:Name="TxtJobs" FontFamily="Consolas"/>
+            </StackPanel>
+            <Border x:Name="BorInvariant" CornerRadius="6" Padding="8,4" Margin="0,6,0,0" HorizontalAlignment="Left">
+                <TextBlock x:Name="TxtInvariant" FontFamily="Consolas" FontWeight="Bold"/>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>
