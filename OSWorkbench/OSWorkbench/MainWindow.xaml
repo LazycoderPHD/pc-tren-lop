@@ -12,5 +12,11 @@
         <TabItem Header="Giám sát">
             <local:MonitorView/>
         </TabItem>
+
+        <!-- THÊM ĐOẠN NÀY VÀO -->
+        <TabItem Header="Tải file">
+            <local:DownloadView/>
+        </TabItem>
+
     </TabControl>
 </Window>
