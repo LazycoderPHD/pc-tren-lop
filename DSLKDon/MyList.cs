@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DSLKDon
 {
@@ -34,26 +30,12 @@ namespace DSLKDon
             return first == null;
         }
 
-        // Thuộc tính Count: đếm số phần tử
-        public int Count
-        {
-            get
-            {
-                int count = 0;
-                IntNode p = first;
-                while (p != null)
-                {
-                    count++;
-                    p = p.Next;
-                }
-                return count;
-            }
-        }
-
         public void AddFirst(IntNode newNode)
         {
             if (IsEmpty())
+            {
                 first = last = newNode;
+            }
             else
             {
                 newNode.Next = first;
@@ -74,6 +56,21 @@ namespace DSLKDon
             }
         }
 
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+                IntNode p = first;
+                while (p != null)
+                {
+                    count++;
+                    p = p.Next;
+                }
+                return count;
+            }
+        }
+
         public void Input()
         {
             int x;
@@ -84,7 +81,7 @@ namespace DSLKDon
                 if (x == 0)
                     return;
                 IntNode newNode = new IntNode(x);
-                AddLast(newNode); // Thêm vào cuối để giữ đúng thứ tự nhập
+                AddFirst(newNode);
             } while (true);
         }
 
@@ -99,112 +96,306 @@ namespace DSLKDon
             Console.WriteLine("null");
         }
 
-        // ==================== CÂU 2: TÌM KIẾM VÀ CỰC TRỊ ====================
-
-        // 1. Tìm kiếm node có giá trị x
         public IntNode SearchX(int x)
         {
             IntNode p = first;
             while (p != null)
             {
-                if (p.Data == x)
-                    return p;
+                if (p.Data == x) return p;
                 p = p.Next;
             }
             return null;
         }
 
-        // 2. Lấy node có giá trị lớn nhất
         public IntNode GetMax()
         {
             if (IsEmpty()) return null;
-
             IntNode maxNode = first;
             IntNode p = first.Next;
             while (p != null)
             {
-                if (p.Data > maxNode.Data)
-                {
-                    maxNode = p;
-                }
+                if (p.Data > maxNode.Data) maxNode = p;
                 p = p.Next;
             }
             return maxNode;
         }
 
-        // 3. Lấy node có giá trị nhỏ nhất
         public IntNode GetMin()
         {
             if (IsEmpty()) return null;
-
             IntNode minNode = first;
             IntNode p = first.Next;
             while (p != null)
             {
-                if (p.Data < minNode.Data)
-                {
-                    minNode = p;
-                }
+                if (p.Data < minNode.Data) minNode = p;
                 p = p.Next;
             }
             return minNode;
         }
 
-        // ==================== PHẦN B: CÂU 4 (Tách danh sách chẵn/lẻ) ====================
-
-        // Trả về danh sách gồm các số chẵn
-        public MyList GetEvenList()
+        public void InputWithoutDuplicates()
         {
-            MyList evenList = new MyList();
-            IntNode p = first;
-            while (p != null)
+            int x;
+            do
             {
-                if (p.Data % 2 == 0)
+                Console.Write("Value (0 to stop): ");
+                if (!int.TryParse(Console.ReadLine(), out x)) continue;
+                if (x == 0) return;
+
+                if (SearchX(x) != null)
                 {
-                    evenList.AddLast(new IntNode(p.Data));
+                    Console.WriteLine($"Gia tri {x} da ton tai! Vui long nhap gia tri khac.");
+                    continue;
                 }
-                p = p.Next;
-            }
-            return evenList;
+
+                IntNode newNode = new IntNode(x);
+                AddLast(newNode);
+            } while (true);
         }
 
-        // Trả về danh sách gồm các số lẻ
-        public MyList GetOddList()
+        public void RemoveAt(int i)
         {
-            MyList oddList = new MyList();
-            IntNode p = first;
-            while (p != null)
+            if (IsEmpty() || i < 0 || i >= Count) return;
+
+            if (i == 0)
             {
-                if (p.Data % 2 != 0)
-                {
-                    oddList.AddLast(new IntNode(p.Data));
-                }
+                first = first.Next;
+                if (first == null) last = null;
+                return;
+            }
+
+            IntNode p = first;
+            for (int idx = 0; idx < i - 1; idx++)
+            {
                 p = p.Next;
             }
-            return oddList;
+            p.Next = p.Next.Next;
+            if (p.Next == null)
+            {
+                last = p;
+            }
         }
 
-        // ==================== PHẦN C: CÂU 5 (Nối hai danh sách) ====================
+        public void RemoveX(int x)
+        {
+            if (IsEmpty()) return;
 
-        // Tạo list3 bằng cách nối list2 vào sau list1 (sử dụng node mới hoàn toàn)[cite: 11]
-        public static MyList JoinList(MyList list1, MyList list2)
+            if (first.Data == x)
+            {
+                first = first.Next;
+                if (first == null) last = null;
+                return;
+            }
+
+            IntNode p = first;
+            while (p.Next != null && p.Next.Data != x)
+            {
+                p = p.Next;
+            }
+
+            if (p.Next != null)
+            {
+                if (p.Next == last)
+                {
+                    last = p;
+                }
+                p.Next = p.Next.Next;
+            }
+        }
+
+        public void InsertAt(int x, int i)
+        {
+            if (i < 0 || i > Count) return;
+
+            if (i == 0)
+            {
+                AddFirst(new IntNode(x));
+                return;
+            }
+            if (i == Count)
+            {
+                AddLast(new IntNode(x));
+                return;
+            }
+
+            IntNode p = first;
+            for (int idx = 0; idx < i - 1; idx++)
+            {
+                p = p.Next;
+            }
+            IntNode newNode = new IntNode(x);
+            newNode.Next = p.Next;
+            p.Next = newNode;
+        }
+
+        public void InsertXAfterMin(int x)
+        {
+            IntNode minNode = GetMin();
+            if (minNode == null) return;
+
+            IntNode newNode = new IntNode(x);
+            newNode.Next = minNode.Next;
+            minNode.Next = newNode;
+            if (minNode == last)
+            {
+                last = newNode;
+            }
+        }
+
+        public void InsertXAfterY(int x, int y)
+        {
+            IntNode yNode = SearchX(y);
+            if (yNode == null) return;
+
+            IntNode newNode = new IntNode(x);
+            newNode.Next = yNode.Next;
+            yNode.Next = newNode;
+            if (yNode == last)
+            {
+                last = newNode;
+            }
+        }
+
+        public void ShiftLeft()
+        {
+            if (IsEmpty()) return;
+            first = first.Next;
+            if (first == null) last = null;
+        }
+
+        public void InsertXBeforeMax(int x)
+        {
+            IntNode maxNode = GetMax();
+            if (maxNode == null) return;
+
+            if (maxNode == first)
+            {
+                AddFirst(new IntNode(x));
+                return;
+            }
+
+            IntNode p = first;
+            while (p != null && p.Next != maxNode)
+            {
+                p = p.Next;
+            }
+
+            if (p != null)
+            {
+                IntNode newNode = new IntNode(x);
+                newNode.Next = maxNode;
+                p.Next = newNode;
+            }
+        }
+
+        public void InsertXBeforeY(int x, int y)
+        {
+            IntNode yNode = SearchX(y);
+            if (yNode == null) return;
+
+            if (yNode == first)
+            {
+                AddFirst(new IntNode(x));
+                return;
+            }
+
+            IntNode p = first;
+            while (p != null && p.Next != yNode)
+            {
+                p = p.Next;
+            }
+
+            if (p != null)
+            {
+                IntNode newNode = new IntNode(x);
+                newNode.Next = yNode;
+                p.Next = newNode;
+            }
+        }
+
+        public void RShiftRight()
+        {
+            if (IsEmpty() || first == last) return;
+
+            IntNode p = first;
+            while (p.Next != last)
+            {
+                p = p.Next;
+            }
+
+            last.Next = first;
+            first = last;
+            last = p;
+            last.Next = null;
+        }
+
+        public void InterchangeSort()
+        {
+            for (IntNode p = first; p != null; p = p.Next)
+            {
+                for (IntNode q = p.Next; q != null; q = q.Next)
+                {
+                    if (p.Data > q.Data)
+                    {
+                        int temp = p.Data;
+                        p.Data = q.Data;
+                        q.Data = temp;
+                    }
+                }
+            }
+        }
+
+        public void SelectionSort()
+        {
+            for (IntNode p = first; p != null; p = p.Next)
+            {
+                IntNode maxNode = p;
+                for (IntNode q = p.Next; q != null; q = q.Next)
+                {
+                    if (q.Data > maxNode.Data)
+                    {
+                        maxNode = q;
+                    }
+                }
+                if (maxNode != p)
+                {
+                    int temp = p.Data;
+                    p.Data = maxNode.Data;
+                    maxNode.Data = temp;
+                }
+            }
+        }
+
+        public static MyList MergeList(MyList list1, MyList list2)
         {
             MyList list3 = new MyList();
+            IntNode p1 = list1.First;
+            IntNode p2 = list2.First;
 
-            // Sao chép các phần tử của list1 sang list3
-            IntNode p = list1.First;
-            while (p != null)
+            while (p1 != null && p2 != null)
             {
-                list3.AddLast(new IntNode(p.Data));
-                p = p.Next;
+                if (p1.Data <= p2.Data)
+                {
+                    list3.AddLast(new IntNode(p1.Data));
+                    p1 = p1.Next;
+                }
+                else
+                {
+                    list3.AddLast(new IntNode(p2.Data));
+                    p2 = p2.Next;
+                }
             }
 
-            // Sao chép các phần tử của list2 sang list3
-            p = list2.First;
-            while (p != null)
+            while (p1 != null)
             {
-                list3.AddLast(new IntNode(p.Data));
-                p = p.Next;
+                list3.AddLast(new IntNode(p1.Data));
+                p1 = p1.Next;
+            }
+
+            while (p2 != null)
+            {
+                list3.AddLast(new IntNode(p2.Data));
+                p2 = p2.Next;
             }
 
             return list3;
