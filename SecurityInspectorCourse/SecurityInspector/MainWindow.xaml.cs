@@ -12,6 +12,9 @@ public partial class MainWindow : Window
         BaselineText.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SecurityInspectorLab", "baseline.json");
         _ = Task.Run(() => Record(Finding.New("App", "Thử Dispatcher", "", "Dòng này xuất phát từ worker; Record chuyển việc thêm hàng về UI.", "Mẫu kiểm tra WPF")));
         RefreshSystemButton.Click += RefreshSystem_Click;
+        ChooseRootButton.Click += ChooseRoot_Click;
+        SaveBaselineButton.Click += SaveBaseline_Click;
+        CompareButton.Click += Compare_Click;
         // [INIT]
     }
 
@@ -31,14 +34,8 @@ public partial class MainWindow : Window
             if (_closing) return;
             if (_all.Count >= MaxHistory) _all.RemoveAt(0);
             _all.Add(item);
-            var list = item.Area switch
-            {
-                "Firewall" => _firewall,
-                "Integrity" => _integrity,
-                "EXE" => _exe,
-                "Log" => _logs,
-                _ => null
-            };
+            var list = item.Area switch { "Firewall" => _firewall, "Integrity" => _integrity,
+                "EXE" => _exe, "Log" => _logs, _ => null };
             list?.Add(item);
         }
         if (_closing || Dispatcher.HasShutdownStarted) return;
@@ -61,6 +58,34 @@ public partial class MainWindow : Window
         SystemText.Text = SystemService.Describe();
         _firewall.Clear();
         foreach (var item in await SystemService.FirewallAsync(ct)) Record(item);
+    });
+
+    string _integrityRoot = "Chưa quét";
+    void ChooseRoot_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "Chọn thư mục thực hành" };
+        if (dialog.ShowDialog(this) == true) RootText.Text = dialog.FolderName;
+    }
+
+    async void SaveBaseline_Click(object sender, RoutedEventArgs e) => await WorkAsync(async ct =>
+    {
+        string root = RootText.Text, destination = BaselineText.Text;
+        var data = await Task.Run(() => BaselineService.BuildAsync(root, ct), ct);
+        await BaselineService.SaveAsync(data, destination, ct);
+        _integrityRoot = data.Root;
+        _integrity.Clear();
+        Record(Finding.New("Integrity", "Baseline", data.Root, $"Đã lưu {data.Files.Count} tệp; {data.Issues.Count} phần lỗi/bỏ qua.", "Thư mục thực hành"));
+        foreach (string issue in data.Issues) Record(Finding.New("Integrity", "Chưa đọc đủ", root, issue, "Thư mục thực hành"));
+    });
+
+    async void Compare_Click(object sender, RoutedEventArgs e) => await WorkAsync(async ct =>
+    {
+        string root = RootText.Text, path = BaselineText.Text;
+        var baseline = await BaselineService.LoadAsync(path, ct);
+        var current = await Task.Run(() => BaselineService.BuildAsync(root, ct), ct);
+        var results = BaselineService.Compare(baseline, current);
+        _integrityRoot = current.Root;
+        _integrity.Clear(); foreach (var item in results) Record(item);
     });
     // [MEMBERS]
 }
