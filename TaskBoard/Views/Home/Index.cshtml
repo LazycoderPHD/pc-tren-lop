@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Quản lý công việc theo bảng Kanban";
+}
+<section class="intro">
+    <h1>Quản lý công việc theo bảng Kanban</h1>
+    <p class="lead">Mỗi dự án có một bảng gồm ba cột: Cần làm, Đang làm và Hoàn thành. Bạn kéo thẻ giữa các cột, gán mức ưu tiên, đặt hạn chót và xem thời gian còn lại ngay trên thẻ.</p>
+    <p>
+        @Html.ActionLink("Đăng nhập", "Login", "Account", null, new { @class = "btn btn-primary btn-lg" })
+        @Html.ActionLink("Tạo tài khoản", "Register", "Account", null, new { @class = "btn btn-default btn-lg" })
+    </p>
+</section>
+
+<section class="row feature-row">
+    <div class="col-md-4">
+        <h3>Kéo thả thẻ</h3>
+        <p>Vị trí của thẻ được lưu vào cơ sở dữ liệu. Khi tải lại trang, thẻ vẫn nằm đúng cột và đúng thứ tự.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Mức ưu tiên và hạn chót</h3>
+        <p>Mỗi thẻ có một trong bốn mức ưu tiên và có thể có hạn chót. Thẻ sắp đến hạn hoặc quá hạn được đánh dấu màu khác.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Làm việc theo nhóm</h3>
+        <p>Chủ dự án thêm thành viên theo tên đăng nhập, giao thẻ cho từng người và theo dõi nhật ký hoạt động của dự án.</p>
+    </div>
+</section>

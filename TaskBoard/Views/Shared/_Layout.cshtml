@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title | TaskBoard</title>
+    <link rel="icon" type="image/svg+xml" href="@Url.Content("~/Content/favicon.svg")" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-static-top app-navbar">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("TaskBoard", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("Dự án", "Index", "Projects")</li>
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li>@Html.ActionLink("Người dùng", "Index", "Users")</li>
+                        }
+                    }
+                </ul>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "navbar-form navbar-right" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-default">Đăng xuất</button>
+                    }
+                    <p class="navbar-text navbar-right">@User.Identity.Name</p>
+                }
+                else
+                {
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>@Html.ActionLink("Đăng nhập", "Login", "Account")</li>
+                        <li>@Html.ActionLink("Đăng ký", "Register", "Account")</li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <div class="container body-content">
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success">@TempData["Message"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @RenderBody()
+    </div>
+
+    <footer class="app-footer">
+        <div class="container">
+            <span>TaskBoard, đồ án môn Lập trình Web</span>
+            <span class="footer-links">
+                @Html.ActionLink("Chính sách quyền riêng tư", "Privacy", "Home")
+                @Html.ActionLink("Điều khoản sử dụng", "Terms", "Home")
+            </span>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="@Url.Content("~/Scripts/taskboard.js")"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

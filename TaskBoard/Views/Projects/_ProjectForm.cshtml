@@ -1,0 +1,13 @@
+﻿@model TaskBoard.Models.ViewModels.ProjectFormViewModel
+
+@Html.HiddenFor(m => m.ProjectId)
+<div class="form-group">
+    @Html.LabelFor(m => m.Name)
+    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", autofocus = "autofocus" })
+    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+</div>
+<div class="form-group">
+    @Html.LabelFor(m => m.Description)
+    @Html.TextAreaFor(m => m.Description, 4, 40, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+</div>

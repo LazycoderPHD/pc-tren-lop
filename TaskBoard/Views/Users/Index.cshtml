@@ -1,0 +1,66 @@
+﻿@using TaskBoard.Models
+@using TaskBoard.Helpers
+@model List<AppUser>
+@{
+    ViewBag.Title = "Người dùng";
+    string selectedRole = ViewBag.Role as string;
+}
+<div class="page-title-row">
+    <h2>Quản lý người dùng</h2>
+    <div class="page-actions">
+        @Html.ActionLink("Thêm tài khoản", "Create", null, new { @class = "btn btn-primary" })
+    </div>
+</div>
+
+@using (Html.BeginForm("Index", "Users", FormMethod.Get, new { @class = "search-form" }))
+{
+    <div class="row">
+        <div class="col-sm-6 form-group">
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Tìm theo tên đăng nhập, họ tên hoặc email" />
+        </div>
+        <div class="col-sm-3 form-group">
+            <select name="role" class="form-control">
+                <option value="">Tất cả vai trò</option>
+                <option value="Admin" selected="@(selectedRole == "Admin")">Admin</option>
+                <option value="Member" selected="@(selectedRole == "Member")">Member</option>
+            </select>
+        </div>
+        <div class="col-sm-3 form-group">
+            <button type="submit" class="btn btn-default">Lọc</button>
+        </div>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover bg-white">
+        <thead>
+            <tr>
+                <th>Tên đăng nhập</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (AppUser account in Model)
+            {
+                <tr>
+                    <td>@account.Username</td>
+                    <td>@account.FullName</td>
+                    <td>@account.Email</td>
+                    <td>@account.Role</td>
+                    <td>@(account.IsActive ? "Hoạt động" : "Đã khóa")</td>
+                    <td>@ViewHelper.ToDisplay(account.CreatedAt)</td>
+                    <td>@Html.ActionLink("Sửa", "Edit", new { id = account.UserId })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@if (Model.Count == 0)
+{
+    <p class="empty-note">Không có tài khoản nào phù hợp.</p>
+}

@@ -1,0 +1,98 @@
+﻿/* TaskBoard: giao diện phẳng, bo góc nhỏ, không dùng gradient. */
+:root {
+    --accent: #0f766e;
+    --accent-dark: #115e59;
+    --ink: #1f2933;
+    --muted: #5f6b7a;
+    --line: #d9dee5;
+    --surface: #ffffff;
+    --page: #f4f6f8;
+}
+
+body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+}
+
+a { color: var(--accent); }
+a:hover, a:focus { color: var(--accent-dark); }
+
+.body-content { padding-top: 24px; padding-bottom: 48px; }
+
+/* Thanh điều hướng */
+.app-navbar { background: var(--surface); border-color: var(--line); margin-bottom: 0; }
+.app-navbar .navbar-brand { font-weight: 700; color: var(--accent); }
+.app-navbar .navbar-nav > li > a { color: var(--ink); }
+
+/* Nút: bo góc nhỏ, màu phẳng */
+.btn { border-radius: 3px; }
+.btn-primary { background: var(--accent); border-color: var(--accent-dark); }
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active { background: var(--accent-dark); border-color: var(--accent-dark); }
+.form-control { border-radius: 3px; box-shadow: none; }
+
+/* Chân trang */
+.app-footer { border-top: 1px solid var(--line); background: var(--surface); padding: 16px 0; color: var(--muted); font-size: 13px; }
+.app-footer .container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.footer-links a { margin-left: 16px; }
+
+/* Tiêu đề trang và nhóm nút */
+.page-title-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.page-title-row h2 { margin-top: 0; }
+.page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.inline-form { display: inline; margin: 0; }
+.form-note { margin-top: 16px; color: var(--muted); }
+.search-form { margin-bottom: 16px; max-width: 640px; }
+.empty-note { padding: 24px 0; color: var(--muted); }
+.bg-white { background: var(--surface); }
+.pre-line { white-space: pre-line; word-wrap: break-word; }
+.legal { max-width: 760px; }
+.legal h3 { margin-top: 28px; }
+
+/* Trang chủ */
+.intro { max-width: 760px; padding: 16px 0 32px; }
+.intro h1 { font-size: 34px; font-weight: 700; }
+.feature-row h3 { font-size: 18px; margin-top: 0; }
+.feature-row .col-md-4 { margin-bottom: 16px; }
+
+/* Bảng Kanban */
+.board { display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; padding-bottom: 12px; }
+.board-column { flex: 0 0 300px; background: #e9edf1; border-radius: 4px; padding: 10px; }
+.board-column-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.board-column-header h4 { margin: 0; font-size: 15px; font-weight: 700; }
+.column-count { color: var(--muted); font-weight: 400; margin-left: 4px; }
+.column-add { font-size: 13px; }
+.task-list { min-height: 80px; }
+
+.task-card { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 3px; padding: 10px; margin-bottom: 8px; cursor: grab; }
+.task-card.dragging { opacity: 0.5; }
+.task-title { display: block; font-weight: 600; color: var(--ink); word-wrap: break-word; }
+.task-title:hover { color: var(--accent-dark); }
+.task-meta { margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+
+/* Nhãn mức ưu tiên: hình chữ nhật bo góc nhỏ, không dùng dạng viên thuốc */
+.tag { display: inline-block; padding: 1px 6px; border-radius: 2px; color: #ffffff; font-size: 12px; font-weight: 600; }
+
+/* Đồng hồ đếm ngược */
+.countdown { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.countdown-soon { color: #b45309; font-weight: 600; }
+.countdown-overdue { color: #b91c1c; font-weight: 600; }
+.countdown-done { color: #15803d; font-weight: 600; }
+
+/* Thành viên, nhật ký, bình luận */
+.side-panels { margin-top: 24px; }
+.plain-list { list-style: none; padding: 0; margin: 0 0 12px; }
+.plain-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.comment-list li { display: block; }
+.member-form { max-width: 520px; }
+.detail-list dt { color: var(--muted); font-weight: 400; margin-top: 12px; }
+.detail-list dd { margin-left: 0; }
+
+/* Màn hình nhỏ (điện thoại): các cột xếp dọc, thanh cuộn ngang không còn cần thiết */
+@media (max-width: 767px) {
+    .board { flex-direction: column; overflow-x: visible; }
+    .board-column { flex: 1 1 auto; width: 100%; }
+    .intro h1 { font-size: 26px; }
+    .footer-links a { margin-left: 0; margin-right: 16px; }
+}

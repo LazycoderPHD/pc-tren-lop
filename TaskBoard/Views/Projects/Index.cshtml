@@ -1,0 +1,58 @@
+﻿@using TaskBoard.Models.ViewModels
+@model List<ProjectListItem>
+@{
+    ViewBag.Title = "Dự án";
+}
+<div class="page-title-row">
+    <h2>Dự án</h2>
+    <div class="page-actions">
+        @Html.ActionLink("Tạo dự án", "Create", null, new { @class = "btn btn-primary" })
+    </div>
+</div>
+
+@using (Html.BeginForm("Index", "Projects", FormMethod.Get, new { @class = "search-form" }))
+{
+    <div class="input-group">
+        <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Tìm theo tên dự án" />
+        <span class="input-group-btn">
+            <button type="submit" class="btn btn-default">Tìm</button>
+        </span>
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <p class="empty-note">Chưa có dự án nào. Hãy tạo dự án đầu tiên để bắt đầu.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover bg-white">
+            <thead>
+                <tr>
+                    <th>Tên dự án</th>
+                    <th>Chủ dự án</th>
+                    <th>Thành viên</th>
+                    <th>Số thẻ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ProjectListItem item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.ActionLink(item.Name, "Details", new { id = item.ProjectId })
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <div class="text-muted small">@item.Description</div>
+                            }
+                        </td>
+                        <td>@item.OwnerName</td>
+                        <td>@item.MemberCount</td>
+                        <td>@item.TaskCount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

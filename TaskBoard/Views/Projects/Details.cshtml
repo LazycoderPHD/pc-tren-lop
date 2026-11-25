@@ -1,0 +1,125 @@
+﻿@using TaskBoard.Models
+@using TaskBoard.Helpers
+@model TaskBoard.Models.ViewModels.BoardViewModel
+@{
+    ViewBag.Title = Model.Project.Name;
+}
+
+<div class="page-title-row">
+    <div>
+        <h2>@Model.Project.Name</h2>
+        @if (!string.IsNullOrEmpty(Model.Project.Description))
+        {
+            <p class="text-muted">@Model.Project.Description</p>
+        }
+        <p class="text-muted small">Chủ dự án: @Model.Project.Owner.FullName</p>
+    </div>
+    <div class="page-actions">
+        @Html.ActionLink("Thêm thẻ", "Create", "Tasks", new { projectId = Model.Project.ProjectId }, new { @class = "btn btn-primary" })
+        @if (Model.CanManage)
+        {
+            @Html.ActionLink("Sửa dự án", "Edit", new { id = Model.Project.ProjectId }, new { @class = "btn btn-default" })
+            using (Html.BeginForm("Delete", "Projects", new { id = Model.Project.ProjectId }, FormMethod.Post, new { @class = "inline-form", onsubmit = "return confirm('Xóa dự án này cùng toàn bộ thẻ bên trong?');" }))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Xóa dự án</button>
+            }
+        }
+    </div>
+</div>
+
+<p class="text-muted small">Kéo thẻ để chuyển cột hoặc đổi thứ tự. Trên màn hình cảm ứng, hãy mở thẻ và chọn cột trong form sửa.</p>
+
+@* Form ẩn chỉ để lấy mã chống giả mạo (anti-forgery token) cho yêu cầu AJAX khi kéo thả *@
+<form id="antiForgeryForm" method="post" action="#" onsubmit="return false;">
+    @Html.AntiForgeryToken()
+</form>
+
+<div id="board" class="board" data-move-url="@Url.Action("Move", "Tasks")">
+    @foreach (BoardColumn column in Model.Columns)
+    {
+        List<TaskItem> columnTasks = Model.Tasks.Where(t => t.ColumnId == column.ColumnId).ToList();
+        bool isDoneColumn = column.ColumnId == Model.Columns.Last().ColumnId;
+
+        <section class="board-column">
+            <header class="board-column-header">
+                <h4>@column.Title <span class="column-count">@columnTasks.Count</span></h4>
+                @Html.ActionLink("Thêm thẻ", "Create", "Tasks", new { projectId = Model.Project.ProjectId, columnId = column.ColumnId }, new { @class = "column-add" })
+            </header>
+            <div class="task-list" data-column-id="@column.ColumnId" data-is-done="@(isDoneColumn ? "1" : "0")">
+                @foreach (TaskItem task in columnTasks)
+                {
+                    <article class="task-card" draggable="true" data-task-id="@task.TaskId" style="border-left-color:@task.Priority.ColorCode">
+                        <a class="task-title" draggable="false" href="@Url.Action("Details", "Tasks", new { id = task.TaskId })">@task.Title</a>
+                        <div class="task-meta">
+                            <span class="tag" style="background-color:@task.Priority.ColorCode">@task.Priority.Name</span>
+                            @if (task.Assignee != null)
+                            {
+                                <span class="task-assignee">@task.Assignee.FullName</span>
+                            }
+                        </div>
+                        @if (task.DueDate.HasValue)
+                        {
+                            <div class="countdown" data-due="@ViewHelper.ToIso(task.DueDate)" data-done="@(task.CompletedAt.HasValue ? "1" : "0")"></div>
+                        }
+                    </article>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+<div class="row side-panels">
+    <div class="col-md-6">
+        <h4>Thành viên</h4>
+        <ul class="plain-list">
+            @foreach (ProjectMember member in Model.Members)
+            {
+                <li>
+                    <span>@member.User.FullName <span class="text-muted">(@member.User.Username)</span>@(member.UserId == Model.Project.OwnerId ? ", chủ dự án" : "")</span>
+                    @if (Model.CanManage && member.UserId != Model.Project.OwnerId)
+                    {
+                        using (Html.BeginForm("RemoveMember", "Projects", new { id = Model.Project.ProjectId }, FormMethod.Post, new { @class = "inline-form", onsubmit = "return confirm('Xóa người này khỏi dự án?');" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@member.UserId" />
+                            <button type="submit" class="btn btn-link btn-xs text-danger">Xóa</button>
+                        }
+                    }
+                </li>
+            }
+        </ul>
+        @if (Model.CanManage)
+        {
+            using (Html.BeginForm("AddMember", "Projects", new { id = Model.Project.ProjectId }, FormMethod.Post, new { @class = "member-form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="input-group">
+                    <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập của thành viên mới" required="required" />
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Thêm thành viên</button>
+                    </span>
+                </div>
+            }
+        }
+    </div>
+    <div class="col-md-6">
+        <h4>Hoạt động gần đây</h4>
+        @if (Model.Logs.Count == 0)
+        {
+            <p class="text-muted">Chưa có hoạt động nào.</p>
+        }
+        else
+        {
+            <ul class="plain-list">
+                @foreach (ActivityLog log in Model.Logs)
+                {
+                    <li>
+                        <span><strong>@log.User.FullName</strong> @log.Message</span>
+                        <span class="text-muted small">@ViewHelper.ToDisplay(log.CreatedAt)</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
